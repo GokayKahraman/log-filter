@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Log Filtreleme</title>
+  <link rel="stylesheet" href="./main.css">
+</head>
+<body>
+  <div class="container">
+
+    
+    <div>
+      <label for="logFile">Log Dosyası:</label>
+      <input type="file" id="logFile" multiple>
+    </div>  
+
+
+    
+    <div class="filters">
+        <div class="filter-item">
+          <input type="text" class="searchTerm" placeholder="Aranacak kelime..."><button id="addFilter">+</button>
+        </div>
+    </div>
+    
+    
+    <button class="filter-button" onclick="filterLogs()">Filtrele</button>
+    
+
+    <div id="results"></div>
+  </div>
+
+
+
+  <script src="./main.js"></script>
+</body>
+</html>
