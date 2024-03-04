@@ -32,17 +32,10 @@ function filterLogs() {
         const fileReader = new FileReader();
         fileReader.onload = function(e) {
             let logContent = e.target.result;
-            let parsedContent = [];
             document.querySelectorAll('.searchTerm').forEach(input => {
                 const searchTerm = input.value;
                 if (searchTerm) {
-                    logContent = logContent.split('\n').filter(line => {
-                        if(line.includes(searchTerm)) {
-                            parsedContent.push(JSON.parse(line))
-                            return true
-                        }
-                    }).join('\n')
-                    console.log(parsedContent)
+                    logContent = logContent.split('\n').filter(line => line.includes(searchTerm)).join('\n')
                 }
             });
 
@@ -52,8 +45,6 @@ function filterLogs() {
 
             filesCount--;
             if (filesCount === 0) {
-                
-                
                 const resultsDiv = document.getElementById('results');
                 resultsDiv.innerHTML = '';
                 filterButton.innerText = "Filter"
@@ -69,6 +60,8 @@ function filterLogs() {
                 link.download = 'filtered_all_logs.log';
                 link.textContent = 'Download Filtered Logs';
                 resultsDiv.appendChild(link);
+
+                console.log(totalContent.split("\n").map(element => element !== "" ? JSON.parse(element) : ""))
             }
         };
 
