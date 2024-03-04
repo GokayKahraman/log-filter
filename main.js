@@ -32,10 +32,17 @@ function filterLogs() {
         const fileReader = new FileReader();
         fileReader.onload = function(e) {
             let logContent = e.target.result;
+            let parsedContent = [];
             document.querySelectorAll('.searchTerm').forEach(input => {
                 const searchTerm = input.value;
                 if (searchTerm) {
-                    logContent = logContent.split('\n').filter(line => line.includes(searchTerm)).join('\n');
+                    logContent = logContent.split('\n').filter(line => {
+                        if(line.includes(searchTerm)) {
+                            parsedContent.push(JSON.parse(line))
+                            return true
+                        }
+                    }).join('\n')
+                    console.log(parsedContent)
                 }
             });
 
