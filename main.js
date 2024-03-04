@@ -61,7 +61,7 @@ function filterLogs() {
                 link.textContent = 'Download Filtered Logs';
                 resultsDiv.appendChild(link);
 
-                console.log(totalContent.split("\n").map(element => element !== "" ? JSON.parse(element) : ""))
+                console.log(totalContent.split("\n").map(el => el !== "" ? JSON.parse(el) : el))
             }
         };
 
