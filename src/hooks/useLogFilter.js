@@ -79,26 +79,38 @@ export function useLogFilter() {
     setIsFiltering(true)
     setShowProgress(true)
     setTotalFileCount(files.length)
-    setCurrentFileIndex(1)
-    setProgress(0)
+
+    const apiPath = API_BY_TYPE[fileType]
+    const textParts = []
+    const logParts = []
 
     try {
-      const apiPath = API_BY_TYPE[fileType]
-      const result = await postFilter(apiPath, files, terms, logToConsole)
+      for (let i = 0; i < files.length; i++) {
+        setCurrentFileIndex(i + 1)
+        setProgress(Math.round(((i + 1) / files.length) * 100))
+
+        const result = await postFilter(apiPath, [files[i]], terms, logToConsole)
+
+        if (logToConsole) {
+          const data = result
+          if (data?.length) logParts.push(...data)
+        } else {
+          if (result?.trim()) textParts.push(result)
+        }
+      }
+
       if (logToConsole) {
-        const data = result
-        debugger
-        if (!data?.length) {
+        if (!logParts.length) {
           setError('Eşleşen sonuç bulunamadı.')
           return
         }
-        const text = data.map((item) => JSON.stringify(item)).join('\n')
+        const text = logParts.map((item) => JSON.stringify(item)).join('\n')
         const blob = new Blob([text], { type: 'text/plain' })
         setDownloadUrl(URL.createObjectURL(blob))
         setDownloadFilename('filtered_all_logs.log')
         return
       }
-      const text = result
+      const text = textParts.join('\n')
       if (!text?.trim()) {
         setError('Eşleşen sonuç bulunamadı.')
         return

@@ -5,7 +5,7 @@ export function ProgressBar({ show, progress, currentFileIndex = 0, totalFileCou
     <div className="progress-wrapper">
       {currentFileIndex > 0 && totalFileCount > 0 && (
         <div className="progress-file-label">
-          Dosya {currentFileIndex} / {totalFileCount}
+          Dosya {currentFileIndex} / {totalFileCount} — %{progress}
         </div>
       )}
       <div id="progress-container">
