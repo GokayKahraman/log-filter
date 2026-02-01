@@ -1,13 +1,16 @@
 import express from 'express'
 import multer from 'multer'
-import { filterLogFiles } from './logFilterService.js'
+import {
+  filterLogFilesStreaming,
+  filterLogFilesLogOnly,
+} from './logFilterService.js'
 import { filterTarGzFiles } from './tarGzFilterService.js'
 
 const app = express()
 const PORT = process.env.PORT || 3001
 
 const memoryStorage = multer.memoryStorage()
-const sizeLimit = { limits: { fileSize: 200 * 1024 * 1024 } }
+const sizeLimit = {}
 
 const uploadLogs = multer({
   storage: memoryStorage,
@@ -39,7 +42,15 @@ const uploadTarGz = multer({
 app.use(express.json({ limit: '1mb' }))
 
 function parseTerms(body) {
-  if (typeof body.terms === 'string') return JSON.parse(body.terms)
+  if (typeof body.terms === 'string') {
+    try {
+      return JSON.parse(body.terms)
+    } catch (_err) {
+      const e = new Error('Filtre terimleri formatı geçersiz.')
+      e.status = 400
+      throw e
+    }
+  }
   if (Array.isArray(body.terms)) return body.terms
   return []
 }
@@ -62,21 +73,20 @@ app.post('/api/filter-logs', uploadLogs.array('files', 20), async (req, res) => 
     }
 
     const buffers = files.map((f) => f.buffer)
-    const { text, logData } = filterLogFiles(buffers, terms, { logToConsole })
 
     if (logToConsole) {
-      return res.status(200).json({ text: text || '', log: logData || [] })
+      const { logData } = filterLogFilesLogOnly(buffers, terms, { logToConsole })
+      return res.status(200).json(logData || [])
     }
-    if (!text.trim()) {
-      return res.status(200).set('Content-Type', 'text/plain; charset=utf-8').send('')
-    }
+
     res.set('Content-Type', 'text/plain; charset=utf-8')
-    res.send(text)
+    filterLogFilesStreaming(buffers, terms, res, { logToConsole })
+    res.end()
   } catch (err) {
     console.error(err)
     res
-      .status(500)
-      .json({ error: err.message || 'Log dosyaları işlenirken bir hata oluştu.' })
+      .status(err?.status || 500)
+      .json({ error: err?.message || 'Log dosyaları işlenirken bir hata oluştu.' })
   }
 })
 
@@ -96,21 +106,36 @@ app.post('/api/filter-targz', uploadTarGz.array('files', 20), async (req, res) =
     const { text, totalLogFiles, logData } = await filterTarGzFiles(buffers, terms, { logToConsole })
 
     if (logToConsole) {
-      return res.status(200).json({ text: text || '', log: logData || [] })
+      return res.status(200).json(logData || [] )
     }
 
-    if (!text || totalLogFiles === 0) {
+    const result = (text != null ? String(text) : '').trim()
+    if (!result || totalLogFiles === 0) {
       return res.status(200).set('Content-Type', 'text/plain; charset=utf-8').send('')
     }
 
     res.set('Content-Type', 'text/plain; charset=utf-8')
-    res.send(text)
+    res.send(result)
   } catch (err) {
     console.error(err)
     res
-      .status(500)
-      .json({ error: err.message || 'tar.gz işlenirken bir hata oluştu.' })
+      .status(err?.status || 500)
+      .json({ error: err?.message || 'tar.gz işlenirken bir hata oluştu.' })
   }
+})
+
+app.use((err, _req, res, next) => {
+  if (err instanceof multer.MulterError) {
+    if (err.code === 'LIMIT_FILE_COUNT') {
+      return res.status(400).json({ error: 'En fazla 20 dosya yükleyebilirsiniz.' })
+    }
+    return res.status(400).json({ error: err.message || 'Dosya yükleme hatası.' })
+  }
+  if (err) {
+    console.error(err)
+    return res.status(err?.status || 500).json({ error: err?.message || 'Sunucu hatası.' })
+  }
+  next()
 })
 
 app.listen(PORT, () => {

@@ -17,8 +17,8 @@ async function postFilter(apiPath, files, terms, logToConsole) {
   }
   if (logToConsole) {
     const data = await res.json()
-    if (data.log?.length) console.log(data.log)
-    return data.text ?? ''
+    console.log(data)
+    return data
   }
   return await res.text()
 }
@@ -33,6 +33,7 @@ export function useLogFilter() {
   const [currentFileIndex, setCurrentFileIndex] = useState(0)
   const [totalFileCount, setTotalFileCount] = useState(0)
   const [downloadUrl, setDownloadUrl] = useState(null)
+  const [downloadFilename, setDownloadFilename] = useState('filtered_all_logs.log')
   const [error, setError] = useState(null)
   const [logToConsole, setLogToConsole] = useState(false)
 
@@ -74,6 +75,7 @@ export function useLogFilter() {
 
     setError(null)
     setDownloadUrl(null)
+    setDownloadFilename('filtered_all_logs.log')
     setIsFiltering(true)
     setShowProgress(true)
     setTotalFileCount(files.length)
@@ -82,13 +84,28 @@ export function useLogFilter() {
 
     try {
       const apiPath = API_BY_TYPE[fileType]
-      const text = await postFilter(apiPath, files, terms, logToConsole)
+      const result = await postFilter(apiPath, files, terms, logToConsole)
+      if (logToConsole) {
+        const data = result
+        debugger
+        if (!data?.length) {
+          setError('Eşleşen sonuç bulunamadı.')
+          return
+        }
+        const text = data.map((item) => JSON.stringify(item)).join('\n')
+        const blob = new Blob([text], { type: 'text/plain' })
+        setDownloadUrl(URL.createObjectURL(blob))
+        setDownloadFilename('filtered_all_logs.log')
+        return
+      }
+      const text = result
       if (!text?.trim()) {
         setError('Eşleşen sonuç bulunamadı.')
         return
       }
       const blob = new Blob([text], { type: 'text/plain' })
       setDownloadUrl(URL.createObjectURL(blob))
+      setDownloadFilename('filtered_all_logs.log')
     } catch (err) {
       setError(err.message || 'Dosya işlenirken bir hata oluştu.')
     } finally {
@@ -113,6 +130,7 @@ export function useLogFilter() {
     currentFileIndex,
     totalFileCount,
     downloadUrl,
+    downloadFilename,
     error,
     hasTerms,
     logToConsole,

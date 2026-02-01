@@ -19,6 +19,7 @@ export default function App() {
     currentFileIndex,
     totalFileCount,
     downloadUrl,
+    downloadFilename,
     error,
     hasTerms,
     files,
@@ -55,7 +56,7 @@ export default function App() {
         onLogToConsoleChange={setLogToConsole}
       />
 
-      <Results error={error} downloadUrl={downloadUrl} />
+      <Results error={error} downloadUrl={downloadUrl} downloadFilename={downloadFilename} />
 
       <ProgressBar
         show={showProgress}
