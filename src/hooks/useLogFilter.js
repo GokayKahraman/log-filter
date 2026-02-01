@@ -1,7 +1,30 @@
-import { useState, useCallback } from 'react'
-import { readFileContentInChunks } from '../utils/logFilterUtils'
+import { useState, useCallback, useEffect } from 'react'
+
+const API_BY_TYPE = {
+  log: '/api/filter-logs',
+  targz: '/api/filter-targz',
+}
+
+async function postFilter(apiPath, files, terms, logToConsole) {
+  const formData = new FormData()
+  files.forEach((f) => formData.append('files', f))
+  formData.append('terms', JSON.stringify(terms))
+  formData.append('logToConsole', String(logToConsole))
+  const res = await fetch(apiPath, { method: 'POST', body: formData })
+  if (!res.ok) {
+    const data = await res.json().catch(() => ({}))
+    throw new Error(data.error || `Sunucu hatası: ${res.status}`)
+  }
+  if (logToConsole) {
+    const data = await res.json()
+    if (data.log?.length) console.log(data.log)
+    return data.text ?? ''
+  }
+  return await res.text()
+}
 
 export function useLogFilter() {
+  const [fileType, setFileType] = useState('log')
   const [files, setFiles] = useState([])
   const [filterTerms, setFilterTerms] = useState([''])
   const [isFiltering, setIsFiltering] = useState(false)
@@ -29,6 +52,11 @@ export function useLogFilter() {
     })
   }, [])
 
+  useEffect(() => {
+    setFiles([])
+    setDownloadUrl(null)
+  }, [fileType])
+
   const handleFileChange = useCallback((e) => {
     const selected = e.target.files
     if (selected?.length) {
@@ -40,7 +68,7 @@ export function useLogFilter() {
   const filterLogs = useCallback(async () => {
     const terms = filterTerms.map((t) => t.trim()).filter(Boolean)
     if (files.length === 0 || terms.length === 0) {
-      setError('Lütfen en az bir log dosyası seçin ve en az bir arama terimi girin.')
+      setError('Lütfen en az bir dosya seçin ve en az bir arama terimi girin.')
       return
     }
 
@@ -48,44 +76,19 @@ export function useLogFilter() {
     setDownloadUrl(null)
     setIsFiltering(true)
     setShowProgress(true)
+    setTotalFileCount(files.length)
+    setCurrentFileIndex(1)
     setProgress(0)
-    const totalCount = files.filter((f) => f.size > 0).length
-    setTotalFileCount(totalCount)
 
     try {
-      const parts = []
-      let bytesProcessed = 0
-      const totalSize = files.reduce((acc, f) => acc + f.size, 0)
-      let fileIndex = 0
-
-      for (const file of files) {
-        if (file.size === 0) continue
-        fileIndex += 1
-        setCurrentFileIndex(fileIndex)
-        const fileChunks = await readFileContentInChunks(
-          file,
-          terms,
-          (offset) => {
-            const totalLoaded = bytesProcessed + offset
-            setProgress(Math.min(100, Math.round((totalLoaded / totalSize) * 100)))
-          },
-          { logToConsole }
-        )
-        bytesProcessed += file.size
-        fileChunks.forEach((chunk) => {
-          if (chunk) parts.push(chunk)
-        })
-        if (fileChunks.some(Boolean) && fileIndex < totalCount) parts.push('\n')
-      }
-
-      if (parts.length === 0) {
+      const apiPath = API_BY_TYPE[fileType]
+      const text = await postFilter(apiPath, files, terms, logToConsole)
+      if (!text?.trim()) {
         setError('Eşleşen sonuç bulunamadı.')
         return
       }
-
-      const blob = new Blob(parts, { type: 'text/plain' })
-      const url = URL.createObjectURL(blob)
-      setDownloadUrl(url)
+      const blob = new Blob([text], { type: 'text/plain' })
+      setDownloadUrl(URL.createObjectURL(blob))
     } catch (err) {
       setError(err.message || 'Dosya işlenirken bir hata oluştu.')
     } finally {
@@ -95,11 +98,13 @@ export function useLogFilter() {
       setCurrentFileIndex(0)
       setTotalFileCount(0)
     }
-  }, [files, filterTerms, logToConsole])
+  }, [fileType, files, filterTerms, logToConsole])
 
   const hasTerms = filterTerms.some((t) => t.trim())
 
   return {
+    fileType,
+    setFileType,
     files,
     filterTerms,
     isFiltering,
