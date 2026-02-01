@@ -1,0 +1,207 @@
+body {
+    font-family: Arial, sans-serif;
+    background-color: #333;
+    color: #fff;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+  }
+  
+  #root {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  .container {
+    background-color: #444;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    width: 300px;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  h1 {
+    color: #4caf50;
+  }
+  
+  label {
+    display: block;
+    margin-top: 10px;
+  }
+  
+  .object-boundary-options {
+    width: 100%;
+    text-align: left;
+  }
+  
+  .object-boundary-options select {
+    width: 100%;
+    padding: 8px;
+    margin-top: 5px;
+    box-sizing: border-box;
+    background: #555;
+    color: #fff;
+    border: 1px solid #666;
+    border-radius: 4px;
+  }
+  
+  .pattern-input-wrap {
+    margin-top: 12px;
+  }
+  
+  .pattern-input-wrap input {
+    font-family: monospace;
+  }
+  
+  input {
+    width: 100%;
+    padding: 8px;
+    margin-top: 5px;
+    box-sizing: border-box;
+  }
+
+  .filter-actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-top: 10px;
+  }
+
+  .log-to-console-option {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+    font-size: 14px;
+    color: #ddd;
+  }
+
+  .log-to-console-option input[type="checkbox"] {
+    cursor: pointer;
+    width: auto;
+  }
+
+  .log-to-console-option input:disabled {
+    cursor: not-allowed;
+  }
+  
+  button {
+    background-color: #4caf50;
+    color: #fff;
+    padding: 10px;
+    margin-top: 10px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    width: 100px;
+  }
+  
+  button:hover:not(:disabled) {
+    background-color: #45a049;
+  }
+  
+  button:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+  }
+  
+  #results {
+    margin-top: 20px;
+  }
+  
+  #results a {
+    color: #4caf50;
+    text-decoration: none;
+    display: block;
+    margin-top: 10px;
+  }
+  
+  #results a:hover {
+    text-decoration: underline;
+  }
+  
+  .filters {
+    display: flex;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    align-items: center;
+    width: 100%;
+  }
+  
+  .filters input {
+    max-width: 90%;
+  }
+  
+  .filter-item {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    width: 100%;
+  }
+  
+  button.removeFilter,
+  button.addFilter {
+    border-radius: 20px;
+    width: 28px;
+    min-width: 28px;
+    height: 28px;
+    padding: 0;
+    text-align: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #ff000091;
+  }
+  
+  button.addFilter {
+    background-color: #4caf50;
+  }
+  
+  .container .error {
+    color: #ff6b6b;
+    margin: 0;
+    font-size: 14px;
+  }
+  
+  .progress-wrapper {
+    margin-top: 10px;
+    width: 100%;
+  }
+
+  .progress-file-label {
+    font-size: 14px;
+    color: #ffffff;
+    margin-bottom: 4px;
+  }
+
+  #progress-container {
+    display: block;
+    width: 100%;
+    background-color: #f3f3f3;
+    border: 1px solid #ccc;
+    margin-top: 10px;
+    border-radius: 4px;
+    overflow: hidden;
+  }
+  
+  #progress-bar {
+    width: 0;
+    height: 10px;
+    background-color: #4caf50;
+    text-align: center;
+    line-height: 20px;
+    color: white;
+    transition: width 0.2s ease;
+  }
+  
