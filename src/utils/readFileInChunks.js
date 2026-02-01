@@ -1,17 +1,7 @@
 import { filterLinesByTerms } from './lineFilter.js'
 
-const CHUNK_SIZE = 1024 * 1024 // 1 MB
+const CHUNK_SIZE = 1024 * 1024
 
-/**
- * Dosyayı parçalar halinde okuyup verilen arama terimlerine göre satırları filtreler.
- * Belleği aşmamak için tek string yerine parça dizisi döndürür.
- *
- * @param {File} file - Okunacak dosya
- * @param {string[]} searchTerms - Arama terimleri
- * @param {(offset: number, fileSize: number) => void} onProgress - İlerleme geri çağrısı
- * @param {{ logToConsole?: boolean }} options - logToConsole true ise eşleşen satırlar konsola yazdırılır
- * @returns {Promise<string[]>} Filtrelenmiş içerik parçaları (tek dev string yok)
- */
 export function readFileContentInChunks(file, searchTerms, onProgress, options = {}) {
   return new Promise((resolve, reject) => {
     const fileReader = new FileReader()

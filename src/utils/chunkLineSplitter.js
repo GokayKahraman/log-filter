@@ -1,10 +1,3 @@
-/**
- * Parça içeriğini tam satırlar ve yarım satır (buffer) olarak ayırır.
- * Parça sınırı satır ortasında kalabileceği için son satırı sonraki parçaya taşır.
- *
- * @param {string} content - Önceki buffer + mevcut parça metni
- * @returns {{ completePart: string, lineBuffer: string }}
- */
 export function getCompleteLinesAndBuffer(content) {
   const lastNewlineIndex = content.lastIndexOf('\n')
 
