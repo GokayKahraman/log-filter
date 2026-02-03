@@ -1,21 +1,19 @@
-# Log Filtreleme
+# Log Filter
 
-Log dosyalarını tarayıp belirttiğiniz terimlere göre filtreleyen, tarayıcıda çalışan bir web uygulaması. Büyük dosyalar parça parça okunur; sonuç tek bir dosya olarak indirilebilir.
+Log dosyalarını belirttiğiniz terimlere göre filtreleyen web uygulaması. Düz metin (.log, .txt) veya `.tar.gz` arşivlerini yükleyebilir, birden fazla filtre terimi ekleyebilir ve sonuçları indirebilir veya konsola yazdırabilirsiniz.
 
 ## Özellikler
 
-- **Çoklu dosya desteği** – Birden fazla log dosyası seçip tek seferde filtreleyebilirsiniz.
-- **Çoklu arama terimi** – İstediğiniz kadar filtre terimi ekleyebilirsiniz; satırlar bu terimlerden en az birini içeriyorsa sonuca dahil edilir.
-- **Büyük dosya desteği** – Dosyalar parça (chunk) halinde okunur, bellek kullanımı sınırlı kalır.
-- **İlerleme göstergesi** – Filtreleme sırasında ilerleme çubuğu ve dosya sayacı gösterilir.
-- **Sonuç indirme** – Eşleşen satırlar tek bir metin dosyası olarak indirilebilir.
-- **Console log** – İsteğe bağlı olarak eşleşen satırlar tarayıcı konsoluna da yazdırılabilir.
+- **Dosya türü seçimi:** Düz log dosyaları (.log, .txt) veya .tar.gz arşivleri
+- **Çoklu filtre terimleri:** İstediğiniz kadar arama terimi ekleyebilirsiniz; satırlar bu terimlerden en az birini içeriyorsa sonuca dahil edilir
+- **Toplu dosya:** Birden fazla dosya seçip tek seferde filtreleyebilirsiniz
+- **İlerleme göstergesi:** Filtreleme sırasında ilerleme çubuğu
+- **Sonuç:** Filtrelenmiş çıktıyı indirme veya tarayıcı konsoluna yazdırma
 
-## Teknolojiler
+## Gereksinimler
 
-- **React 18**
-- **Vite 5**
-- Tarayıcıda dosya okuma: `FileReader` ve chunk tabanlı işleme
+- Node.js (v18 veya üzeri önerilir)
+- npm veya yarn
 
 ## Kurulum
 
@@ -25,50 +23,71 @@ npm install
 
 ## Çalıştırma
 
-Geliştirme sunucusu:
+### Tek komutla (önerilen)
+
+Hem backend hem frontend'i aynı anda başlatmak için:
+
+```bash
+npm start
+```
+
+Bu komut API sunucusunu (port 3001) ve Vite geliştirme sunucusunu (genelde port 5173) birlikte çalıştırır. Tarayıcıda Vite'ın verdiği adresi açın.
+
+### Ayrı terminallerde
+
+İsterseniz sunucuları ayrı ayrı da çalıştırabilirsiniz:
+
+**1. Backend (API sunucusu)**
+
+```bash
+npm run server
+```
+
+Sunucu varsayılan olarak **http://localhost:3001** adresinde çalışır. Portu değiştirmek için ortam değişkeni kullanabilirsiniz:
+
+```bash
+PORT=4000 npm run server
+```
+
+**2. Frontend (geliştirme sunucusu)**
+
+Yeni bir terminalde:
 
 ```bash
 npm run dev
 ```
 
-Uygulama varsayılan olarak `http://localhost:5173` adresinde açılır.
-
-Production build:
-
-```bash
-npm run build
-```
-
-Build önizleme:
-
-```bash
-npm run preview
-```
-
 ## Kullanım
 
-1. **Dosya seçin** – "Dosya seç" ile bir veya birden fazla log dosyası (.log, .txt vb.) seçin.
-2. **Filtre terimleri girin** – En az bir arama terimi yazın; birden fazla terim eklemek için "+" kullanın.
-3. **Filtrele** – "Filtrele" butonuna tıklayın.
-4. **İndir** – İşlem bitince "İndir" ile eşleşen satırları içeren dosyayı indirin.
+1. **Dosya türünü seçin:** "Log dosyaları" veya "Tar.gz arşivi"
+2. **Dosya(lar)ı yükleyin:** Dosya seç veya sürükle-bırak
+3. **Filtre terimlerini girin:** Her terim için bir alan; terim eklemek için "+" kullanın
+4. **Filtrele:** "Filtrele" butonuna tıklayın
+5. **Sonucu alın:** İndir veya "Konsola yazdır" ile tarayıcı konsolunda görüntüleyin
 
-Terimler satır içinde geçtiği sürece eşleşir; büyük/küçük harf duyarlılığı yoktur.
+## Teknik Detaylar
 
-## Proje yapısı
+- **Frontend:** React 18, Vite 5
+- **Backend:** Express, Multer (dosya yükleme), tar-stream (.tar.gz işleme)
+- **Dosya boyutu sınırı:** 200 MB (sunucu tarafında)
+
+## Proje Yapısı
 
 ```
 log-filter/
-├── src/
-│   ├── components/       # UI bileşenleri (FileInput, FilterTerms, ProgressBar, Results)
-│   ├── hooks/            # useLogFilter – filtreleme mantığı ve state
-│   ├── utils/            # Chunk okuma, satır bölme, satır filtreleme
-│   ├── App.jsx
-│   └── main.jsx
-├── index.html
+├── src/                 # React uygulaması
+│   ├── components/      # UI bileşenleri
+│   ├── hooks/           # useLogFilter vb.
+│   └── App.jsx
+├── server/              # Express API
+│   ├── index.js         # Sunucu ve route'lar
+│   ├── logFilterService.js
+│   ├── tarGzFilterService.js
+│   └── lineFilter.js
 ├── package.json
 └── vite.config.js
 ```
 
 ## Lisans
 
-Private proje.
+Bu proje private olarak kullanılmak üzere yapılandırılmıştır.
