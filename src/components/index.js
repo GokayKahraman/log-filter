@@ -1,4 +1,6 @@
 export { FileInput } from './FileInput'
+export { FileTypeChoice } from './FileTypeChoice'
+export { FilterActions } from './FilterActions'
 export { FilterTerms } from './FilterTerms'
 export { FilterTermItem } from './FilterTermItem'
 export { ProgressBar } from './ProgressBar'

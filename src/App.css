@@ -39,6 +39,29 @@ body {
     display: block;
     margin-top: 10px;
   }
+
+  .file-type-choice {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+
+  .file-type-choice span {
+    margin: 0;
+  }
+
+  .file-type-choice label {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 0;
+    cursor: pointer;
+  }
+
+  .file-type-choice input[type="radio"] {
+    cursor: pointer;
+  }
   
   .object-boundary-options {
     width: 100%;

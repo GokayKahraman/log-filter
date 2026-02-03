@@ -1,8 +1,17 @@
 import { useLogFilter } from './hooks/useLogFilter'
-import { FileInput, FilterTerms, ProgressBar, Results } from './components'
+import {
+  FileInput,
+  FileTypeChoice,
+  FilterActions,
+  FilterTerms,
+  ProgressBar,
+  Results,
+} from './components'
 
 export default function App() {
   const {
+    fileType,
+    setFileType,
     filterTerms,
     isFiltering,
     showProgress,
@@ -10,6 +19,7 @@ export default function App() {
     currentFileIndex,
     totalFileCount,
     downloadUrl,
+    downloadFilename,
     error,
     hasTerms,
     files,
@@ -24,7 +34,12 @@ export default function App() {
 
   return (
     <div className="container">
-      <FileInput onFileChange={handleFileChange} />
+      <FileTypeChoice
+        fileType={fileType}
+        onFileTypeChange={setFileType}
+        disabled={isFiltering}
+      />
+      <FileInput fileType={fileType} onFileChange={handleFileChange} />
 
       <FilterTerms
         terms={filterTerms}
@@ -33,27 +48,15 @@ export default function App() {
         onTermChange={updateFilterTerm}
       />
 
-      <div className="filter-actions">
-        <button
-          type="button"
-          className="filter-button"
-          onClick={filterLogs}
-          disabled={isFiltering || !hasTerms || files.length === 0}
-        >
-          {isFiltering ? '...' : 'Filtrele'}
-        </button>
-        <label className="log-to-console-option">
-          <input
-            type="checkbox"
-            checked={logToConsole}
-            onChange={(e) => setLogToConsole(e.target.checked)}
-            disabled={isFiltering}
-          />
-          <span>console log ?</span>
-        </label>
-      </div>
+      <FilterActions
+        onFilter={filterLogs}
+        disabled={isFiltering || !hasTerms || files.length === 0}
+        isFiltering={isFiltering}
+        logToConsole={logToConsole}
+        onLogToConsoleChange={setLogToConsole}
+      />
 
-      <Results error={error} downloadUrl={downloadUrl} />
+      <Results error={error} downloadUrl={downloadUrl} downloadFilename={downloadFilename} />
 
       <ProgressBar
         show={showProgress}

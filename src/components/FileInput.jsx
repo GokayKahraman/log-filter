@@ -1,12 +1,15 @@
-export function FileInput({ onFileChange }) {
+export function FileInput({ fileType, onFileChange }) {
+  const isTarGz = fileType === 'targz'
   return (
     <div>
-      <label htmlFor="logFile">Log Dosyası:</label>
+      <label htmlFor="logFile">
+        {isTarGz ? 'tar.gz Dosyası:' : 'Log Dosyası:'}
+      </label>
       <input
         type="file"
         id="logFile"
         multiple
-        accept=".log,.txt,text/*"
+        accept={isTarGz ? '.tar.gz,.tgz,application/gzip,application/x-gzip' : '.log,.txt,text/*'}
         onChange={onFileChange}
       />
     </div>
