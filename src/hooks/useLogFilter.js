@@ -17,7 +17,7 @@ async function postFilter(apiPath, files, terms, logToConsole) {
   }
   if (logToConsole) {
     const data = await res.json()
-    console.log(data)
+    data.length && console.log(data)
     return data
   }
   return await res.text()
